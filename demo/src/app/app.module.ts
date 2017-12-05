@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { DateRangePickerModule } from '../../../src';
 import { AppComponent } from './app.component';
 import { FormsModule } from '@angular/forms';
 
@@ -15,7 +14,6 @@ import { FormsModule } from '@angular/forms';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    DateRangePickerModule,
     FormsModule
   ],
   providers: [],

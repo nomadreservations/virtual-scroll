@@ -1,3 +1,30 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [@nomadreservations/virtual-scroll](#nomadreservationsvirtual-scroll)
+  - [About](#about)
+  - [New features:](#new-features)
+  - [Demo](#demo)
+  - [Usage](#usage)
+  - [Get Started](#get-started)
+  - [API](#api)
+  - [Getting view port items without events](#getting-view-port-items-without-events)
+  - [Additional elements in scroll](#additional-elements-in-scroll)
+  - [Use scrollbar of parent block](#use-scrollbar-of-parent-block)
+  - [Use scrollbar of window](#use-scrollbar-of-window)
+  - [Items with variable size](#items-with-variable-size)
+  - [Loading in chunk](#loading-in-chunk)
+  - [If container size change](#if-container-size-change)
+  - [Focus on an item](#focus-on-an-item)
+  - [Sorting Items](#sorting-items)
+  - [Contributing](#contributing)
+  - [Author](#author)
+  - [Versions](#versions)
+  - [License](#license)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 
 # @nomadreservations/virtual-scroll
 
@@ -8,7 +35,8 @@ Virtual Scroll displays a virtual, "infinite" list. Supports multi-column. Based
 This module displays a small subset of records just enough to fill the viewport and uses the same DOM elements as the user scrolls.
 This method is effective because the number of DOM elements are always constant and tiny irrespective of the size of the list. Thus virtual scroll can display infinitely growing list of items in an efficient way.
 
-* Angular 2 compatible module
+* Angular 4+ compatible module
+* Angular Universal/SSR compatible
 * Supports multi-column
 * Easy to use apis
 * OpenSource and available in GitHub
@@ -20,7 +48,7 @@ This method is effective because the number of DOM elements are always constant 
 
 ## Demo
 
-[See Demo Here](http://rintoj.github.io/angular2-virtual-scroll)
+TBD
 
 ## Usage
 
@@ -60,14 +88,14 @@ alternatively
 **Step 1:** Install angular2-virtual-scroll
 
 ```sh
-npm install angular2-virtual-scroll --save
+npm install @nomadreservations/virtual-scroll --save
 ```
 
 **Step 2:** Import virtual scroll module into your app module
 
 ```ts
 ....
-import { VirtualScrollModule } from 'angular2-virtual-scroll';
+import { VirtualScrollModule } from '@nomadreservations/virtual-scroll';
 
 ....
 
