@@ -41,7 +41,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://bitbucket.org/campgroundbooking/virtual-scroll"
+        "url": "https://github.com/nomadreservatons/virtual-scroll"
     },
     "license": "MIT",
     "keywords": [
