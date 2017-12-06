@@ -1,9 +1,9 @@
 #!/bin/sh
-STATUS="$(git status)"
+STATUS="$(git status -s)"
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-if [[ $STATUS == *"nothing to commit, working directory clean"* ]]
+if [[ -z "${STATUS// }" ]]
 then
     sed -i "" '/\/documentation/d' ./.gitignore
     git add .
