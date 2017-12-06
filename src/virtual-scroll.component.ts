@@ -13,9 +13,12 @@ import {
   Renderer2,
   SimpleChanges,
   ViewChild,
+  Inject,
 } from '@angular/core';
+import { WindowRef } from './window-ref';
 
 const tween = require('@tweenjs/tween.js');
+
 
 export interface ChangeEvent {
   start?: number;
@@ -57,58 +60,58 @@ export interface ChangeEvent {
 export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input()
-  items: any[] = [];
+  public items: any[] = [];
 
   @Input()
-  scrollbarWidth: number;
+  public scrollbarWidth: number;
 
   @Input()
-  scrollbarHeight: number;
+  public scrollbarHeight: number;
 
   @Input()
-  childWidth: number;
+  public childWidth: number;
 
   @Input()
-  childHeight: number;
+  public childHeight: number;
 
   @Input()
-  bufferAmount: number = 0;
+  public bufferAmount: number = 0;
 
   @Input()
-  scrollAnimationTime: number = 1500;
+  public scrollAnimationTime: number = 1500;
 
 
   @Output()
-  update: EventEmitter<any[]> = new EventEmitter<any[]>();
-  viewPortItems: any[];
+  public update: EventEmitter<any[]> = new EventEmitter<any[]>();
+  public viewPortItems: any[];
 
   @Output()
-  change: EventEmitter<ChangeEvent> = new EventEmitter<ChangeEvent>();
+  public change: EventEmitter<ChangeEvent> = new EventEmitter<ChangeEvent>();
 
   @Output()
-  start: EventEmitter<ChangeEvent> = new EventEmitter<ChangeEvent>();
+  public start: EventEmitter<ChangeEvent> = new EventEmitter<ChangeEvent>();
 
   @Output()
-  end: EventEmitter<ChangeEvent> = new EventEmitter<ChangeEvent>();
+  public end: EventEmitter<ChangeEvent> = new EventEmitter<ChangeEvent>();
 
   @ViewChild('content', { read: ElementRef })
-  contentElementRef: ElementRef;
+  private contentElementRef: ElementRef;
 
   @ViewChild('shim', { read: ElementRef })
-  shimElementRef: ElementRef;
+  private shimElementRef: ElementRef;
 
   @ContentChild('container')
-  containerElementRef: ElementRef;
+  private containerElementRef: ElementRef;
 
-  previousStart?: number;
-  previousEnd?: number;
-  startupLoop: boolean = true;
-  currentTween: any;
+  private previousStart?: number;
+  private previousEnd?: number;
+  private startupLoop: boolean = true;
+  private currentTween: any;
 
-  private _parentScroll: Element | Window;
+  private _parentScroll: ElementRef | WindowRef;
 
   @Input()
-  set parentScroll(element: Element | Window) {
+  set parentScroll(element: ElementRef | WindowRef) {
     if (this._parentScroll === element) {
       return;
     }
@@ -116,7 +119,7 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
     this.addParentEventHandlers(this._parentScroll);
   }
 
-  get parentScroll(): Element | Window {
+  get parentScroll(): ElementRef | WindowRef {
     return this._parentScroll;
   }
 
@@ -130,11 +133,13 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
   private lastTopPadding = -1;
 
   constructor(
+    private windowRef: WindowRef,
     private readonly element: ElementRef,
     private readonly renderer: Renderer2,
-    private readonly zone: NgZone) { }
+    private readonly zone: NgZone
+  ) { }
 
-  ngOnInit() {
+  public ngOnInit() {
     this.scrollbarWidth = 0; // this.element.nativeElement.offsetWidth - this.element.nativeElement.clientWidth;
     this.scrollbarHeight = 0; // this.element.nativeElement.offsetHeight - this.element.nativeElement.clientHeight;
 
@@ -143,11 +148,11 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  ngOnDestroy() {
+  public ngOnDestroy() {
     this.removeParentEventHandlers();
   }
 
-  ngOnChanges(changes: SimpleChanges) {
+  public ngOnChanges(changes: SimpleChanges) {
     this.previousStart = undefined;
     this.previousEnd = undefined;
     const items = (changes as any).items || {};
@@ -157,7 +162,7 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
     this.refresh();
   }
 
-  refresh() {
+  public refresh() {
     this.zone.runOutsideAngular(() => {
       if (typeof requestAnimationFrame !== 'undefined') {
         requestAnimationFrame(() => this.calculateItems());
@@ -165,8 +170,8 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
-  scrollInto(item: any) {
-    let el: Element = this.parentScroll instanceof Window ? document.body : this.parentScroll || this.element.nativeElement;
+  public scrollInto(item: any) {
+    let el: Element = this._parentElement;
     let offsetTop = this.getElementsOffset();
     let index: number = (this.items || []).indexOf(item);
     if (index < 0 || index >= (this.items || []).length) return;
@@ -197,13 +202,13 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
     animate();
   }
 
-  private addParentEventHandlers(parentScroll: Element | Window) {
+  private addParentEventHandlers(parentScroll: ElementRef | WindowRef) {
     this.removeParentEventHandlers();
     if (parentScroll) {
       this.zone.runOutsideAngular(() => {
         this.disposeScrollHandler =
           this.renderer.listen(parentScroll, 'scroll', this.refreshHandler);
-        if (parentScroll instanceof Window) {
+        if (parentScroll instanceof WindowRef) {
           this.disposeScrollHandler =
             this.renderer.listen('window', 'resize', this.refreshHandler);
         }
@@ -244,8 +249,19 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
     return offsetTop;
   }
 
+  private get _parentElement(): Element {
+    if (this.parentScroll instanceof WindowRef) {
+      return document.body;
+    }
+    if (this.parentScroll) {
+      return this.parentScroll.nativeElement;
+    }
+
+    return this.element.nativeElement;
+  }
+
   private calculateDimensions() {
-    let el: Element = this.parentScroll instanceof Window ? document.body : this.parentScroll || this.element.nativeElement;
+    let el: Element = this._parentElement;
     let items = this.items || [];
     let itemCount = items.length;
     let viewWidth = el.clientWidth - this.scrollbarWidth;
@@ -268,7 +284,7 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
     let itemsPerRow = Math.max(1, this.countItemsPerRow());
     let itemsPerRowByCalc = Math.max(1, Math.floor(viewWidth / childWidth));
     let itemsPerCol = Math.max(1, Math.floor(viewHeight / childHeight));
-    let elScrollTop = this.parentScroll instanceof Window
+    let elScrollTop = this.parentScroll instanceof WindowRef
       ? (window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0)
       : el.scrollTop;
     let scrollTop = Math.max(0, elScrollTop);
@@ -297,13 +313,13 @@ export class VirtualScrollComponent implements OnInit, OnChanges, OnDestroy {
 
   private calculateItems() {
     NgZone.assertNotInAngularZone();
-    let el = this.parentScroll instanceof Window ? document.body : this.parentScroll || this.element.nativeElement;
+    let el: Element = this._parentElement;
 
     let d = this.calculateDimensions();
     let items = this.items || [];
     let offsetTop = this.getElementsOffset();
-    let elScrollTop = this.parentScroll instanceof Window
-      ? (window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0)
+    let elScrollTop: number = (this.parentScroll instanceof WindowRef)
+      ? (this.windowRef.nativeWindow.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0)
       : el.scrollTop;
 
     if (elScrollTop > d.scrollHeight) {
