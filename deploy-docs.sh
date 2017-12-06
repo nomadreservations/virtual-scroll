@@ -1,18 +1,16 @@
-#!/usr/bin/env bash
+#!/bin/sh
+STATUS="$(git status)"
+RED='\033[0;31m'
+NC='\033[0m' # No Color
 
-GIT_DEPLOY_REPO=${GIT_DEPLOY_REPO:-$(node -p -e "require('./package.json').repository.url")}
-
-cd documentation
-
-rm -R .git  > /dev/null 2>&1
-git init
-
-git config user.name "Travis CI"
-git config user.email "github@travis-ci.org"
-
-git add .
-git commit -m "Deploy to GitHub Pages"
-
-git push --force "https://${GH_TOKEN}@${GH_REF}" master:gh-pages > /dev/null 2>&1
-
-exit 0
+if [[ $STATUS == *"nothing to commit, working directory clean"* ]]
+then
+    sed -i "" '/\/documentation/d' ./.gitignore
+    git add .
+    git commit -m "Edit .gitignore to publish"
+    git push origin `git subtree split --prefix documentation master`:gh-pages --force
+    git reset HEAD~
+    git checkout .gitignore
+else
+    printf "${RED}ERROR:${NC} Need clean working directory to publish\n"
+fi
