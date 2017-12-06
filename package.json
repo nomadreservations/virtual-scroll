@@ -1,6 +1,6 @@
 {
     "name": "@nomadreservations/virtual-scroll",
-    "version": "1.2.0-rc.0",
+    "version": "1.2.0",
     "description": "Virtual scroll directive for @angular (univeral compliant)",
     "main": "./bundles/virtual-scroll.umd.js",
     "module": "./esm5/virtual-scroll.js",
