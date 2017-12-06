@@ -7,8 +7,8 @@ cd documentation && \
 rm -R .git
 git init && \
 
-# git config user.name "CI" && \
-# git config user.email "github@travis-ci.org" && \
+git config user.name "Travis CI" && \
+git config user.email "github@travis-ci.org" && \
 
 git add . && \
 git commit -m "Deploy to GitHub Pages" && \
